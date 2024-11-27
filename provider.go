@@ -3,8 +3,10 @@ package timeweb
 import (
 	"context"
 	"fmt"
-	"github.com/libdns/libdns"
 	"net/http"
+	"strings"
+
+	"github.com/libdns/libdns"
 )
 
 type Provider struct {
@@ -13,6 +15,10 @@ type Provider struct {
 }
 
 func (p *Provider) GetRecords(ctx context.Context, zone string) ([]libdns.Record, error) {
+	if strings.HasSuffix(zone, ".") {
+		zone = zone[:len(zone)-1]
+	}
+
 	reqURL := fmt.Sprintf("%s/domains/%s/dns-records", p.ApiURL, zone)
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, reqURL, nil)
 	if err != nil {
@@ -31,6 +37,9 @@ func (p *Provider) GetRecords(ctx context.Context, zone string) ([]libdns.Record
 }
 
 func (p *Provider) AppendRecords(ctx context.Context, zone string, records []libdns.Record) ([]libdns.Record, error) {
+	if strings.HasSuffix(zone, ".") {
+		zone = zone[:len(zone)-1]
+	}
 	var created []libdns.Record
 	for _, record := range records {
 		result, err := p.createRecord(ctx, zone, record)
@@ -44,6 +53,9 @@ func (p *Provider) AppendRecords(ctx context.Context, zone string, records []lib
 }
 
 func (p *Provider) DeleteRecords(ctx context.Context, zone string, records []libdns.Record) ([]libdns.Record, error) {
+	if strings.HasSuffix(zone, ".") {
+		zone = zone[:len(zone)-1]
+	}
 	var deleted []libdns.Record
 	for _, record := range records {
 		err := p.deleteRecord(ctx, zone, record)
@@ -57,6 +69,9 @@ func (p *Provider) DeleteRecords(ctx context.Context, zone string, records []lib
 }
 
 func (p *Provider) SetRecords(ctx context.Context, zone string, records []libdns.Record) ([]libdns.Record, error) {
+	if strings.HasSuffix(zone, ".") {
+		zone = zone[:len(zone)-1]
+	}
 	zoneRecords, err := p.GetRecords(ctx, zone)
 	if err != nil {
 		return nil, err

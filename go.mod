@@ -1,4 +1,4 @@
-module github.com/libdns/timeweb
+module github.com/nlif-m/libdns-timeweb
 
 go 1.18
 
